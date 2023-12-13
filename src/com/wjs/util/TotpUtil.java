@@ -15,24 +15,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ *
  */
 public class TotpUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(TotpUtil.class);
 
-    private TotpUtil() {}
+    private TotpUtil() {
+    }
 
     /**
      * This method uses the JCE to provide the crypto algorithm.
      * HMAC computes a Hashed Message Authentication Code with the
      * crypto hash algorithm as a parameter.
      *
-     * @param crypto: the crypto algorithm (HmacSHA1, HmacSHA256,
-     *                             HmacSHA512)
+     * @param crypto:   the crypto algorithm (HmacSHA1, HmacSHA256,
+     *                  HmacSHA512)
      * @param keyBytes: the bytes to use for the HMAC key
-     * @param text: the message or text to be authenticated
+     * @param text:     the message or text to be authenticated
      */
     private static byte[] hmac_sha(String crypto, byte[] keyBytes,
-                                   byte[] text){
+                                   byte[] text) {
         try {
             Mac hmac;
             hmac = Mac.getInstance(crypto);
@@ -49,38 +51,36 @@ public class TotpUtil {
      * This method converts a HEX string to Byte[]
      *
      * @param hex: the HEX string
-     *
      * @return: a byte array
      */
-    private static byte[] hexStr2Bytes(String hex){
+    private static byte[] hexStr2Bytes(String hex) {
         // Adding one byte to get the right conversion
         // Values starting with "0" can be converted
-        byte[] bArray = new BigInteger("10" + hex,16).toByteArray();
+        byte[] bArray = new BigInteger("10" + hex, 16).toByteArray();
 
         // Copy all the REAL bytes, not the "first"
         byte[] ret = new byte[bArray.length - 1];
         for (int i = 0; i < ret.length; i++)
-            ret[i] = bArray[i+1];
+            ret[i] = bArray[i + 1];
         return ret;
     }
 
     private static final int[] DIGITS_POWER
             // 0 1  2   3    4     5      6       7        8
-            = {1,10,100,1000,10000,100000,1000000,10000000,100000000 };
+            = {1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000};
 
     /**
      * This method generates a TOTP value for the given
      * set of parameters.
      *
-     * @param key: the shared secret, HEX encoded
-     * @param time: a value that reflects a time
+     * @param key:          the shared secret, HEX encoded
+     * @param time:         a value that reflects a time
      * @param returnDigits: number of digits to return
-     *
      * @return: a numeric String in base 10 that includes truncationDigits digits
      */
     public static String generateTOTP(String key,
                                       String time,
-                                      String returnDigits){
+                                      String returnDigits) {
         return generateTOTP(key, time, returnDigits, "HmacSHA1");
     }
 
@@ -88,15 +88,14 @@ public class TotpUtil {
      * This method generates a TOTP value for the given
      * set of parameters.
      *
-     * @param key: the shared secret, HEX encoded
-     * @param time: a value that reflects a time
+     * @param key:          the shared secret, HEX encoded
+     * @param time:         a value that reflects a time
      * @param returnDigits: number of digits to return
-     *
      * @return: a numeric String in base 10 that includes truncationDigits digits
      */
     public static String generateTOTP256(String key,
                                          String time,
-                                         String returnDigits){
+                                         String returnDigits) {
         return generateTOTP(key, time, returnDigits, "HmacSHA256");
     }
 
@@ -104,15 +103,14 @@ public class TotpUtil {
      * This method generates a TOTP value for the given
      * set of parameters.
      *
-     * @param key: the shared secret, HEX encoded
-     * @param time: a value that reflects a time
+     * @param key:          the shared secret, HEX encoded
+     * @param time:         a value that reflects a time
      * @param returnDigits: number of digits to return
-     *
      * @return: a numeric String in base 10 that includes truncationDigits digits
      */
     public static String generateTOTP512(String key,
                                          String time,
-                                         String returnDigits){
+                                         String returnDigits) {
         return generateTOTP(key, time, returnDigits, "HmacSHA512");
     }
 
@@ -120,24 +118,23 @@ public class TotpUtil {
      * This method generates a TOTP value for the given
      * set of parameters.
      *
-     * @param key: the shared secret, HEX encoded
-     * @param time: a value that reflects a time
+     * @param key:          the shared secret, HEX encoded
+     * @param time:         a value that reflects a time
      * @param returnDigits: number of digits to return
-     * @param crypto: the crypto function to use
-     *
+     * @param crypto:       the crypto function to use
      * @return: a numeric String in base 10 that includes truncationDigits digits
      */
     public static String generateTOTP(String key,
                                       String time,
                                       String returnDigits,
-                                      String crypto){
+                                      String crypto) {
         int codeDigits = Integer.decode(returnDigits).intValue();
         String result = null;
 
         // Using the counter
         // First 8 bytes are for the movingFactor
         // Compliant with base RFC 4226 (HOTP)
-        while (time.length() < 16 )
+        while (time.length() < 16)
             time = "0" + time;
 
         // Get the HEX in a Byte[]
@@ -165,39 +162,42 @@ public class TotpUtil {
     }
 
     /**
-     * ÑéÖ¤¶¯Ì¬¿ÚÁîÊÇ·ñÕýÈ·
-     * @param secretBase32 ÃÜÔ¿
-     * @param code ´ýÑéÖ¤µÄ¶¯Ì¬¿ÚÁî
+     * éªŒè¯åŠ¨æ€å£ä»¤æ˜¯å¦æ­£ç¡®
+     *
+     * @param secretBase32 å¯†é’¥
+     * @param code         å¾…éªŒè¯çš„åŠ¨æ€å£ä»¤
      * @return
      */
-    public static boolean verify(String secretBase32, String code){
+    public static boolean verify(String secretBase32, String code) {
         return generate(secretBase32).equals(code);
     }
 
     /**
-     * Éú³ÉtotpÐ­Òé×Ö·û´®
+     * ç”Ÿæˆtotpåè®®å­—ç¬¦ä¸²
+     *
      * @param accoName
      * @param domain
      * @param secretBase32
      * @return
      */
-    public static String generateTotpString(String accoName, String domain, String secretBase32){
+    public static String generateTotpString(String accoName, String domain, String secretBase32) {
         return "otpauth://totp/" + accoName + "@" + domain + "?secret=" + secretBase32;
     }
 
     /**
-     * ¸ù¾ÝÃÜÔ¿Éú³É¶¯Ì¬¿ÚÁî
-     * @param secretBase32 base32±àÂë¸ñÊ½µÄÃÜÔ¿
+     * æ ¹æ®å¯†é’¥ç”ŸæˆåŠ¨æ€å£ä»¤
+     *
+     * @param secretBase32 base32ç¼–ç æ ¼å¼çš„å¯†é’¥
      * @return
      */
-    public static String generate(String secretBase32){
+    public static String generate(String secretBase32) {
 
         String secretHex = "";
         try {
             secretHex = HexEncoding.encode(Base32String.decode(secretBase32));
         } catch (Base32String.DecodingException e) {
-            LOGGER.error("½âÂë" + secretBase32 + "³ö´í£¬", e);
-            throw new RuntimeException("½âÂëBase32³ö´í");
+            LOGGER.error("è§£ç " + secretBase32 + "å‡ºé”™ï¼Œ", e);
+            throw new RuntimeException("è§£ç Base32å‡ºé”™");
         }
 
         long X = 30;
@@ -215,16 +215,18 @@ public class TotpUtil {
             return generateTOTP(secretHex, steps, "6",
                     "HmacSHA1");
         } catch (final Exception e) {
-            LOGGER.error("Éú³É¶¯Ì¬¿ÚÁî³ö´í£º" + secretBase32, e);
-            throw new RuntimeException("Éú³É¶¯Ì¬¿ÚÁî³ö´í");
+            LOGGER.error("ç”ŸæˆåŠ¨æ€å£ä»¤å‡ºé”™ï¼š" + secretBase32, e);
+            throw new RuntimeException("ç”ŸæˆåŠ¨æ€å£ä»¤å‡ºé”™");
         }
     }
+
     /**
-     * Éú³Ébase32±àÂëµÄËæ»úÃÜÔ¿
+     * ç”Ÿæˆbase32ç¼–ç çš„éšæœºå¯†é’¥
+     *
      * @param length
      * @return
      */
-    public static String getRandomSecretBase32(int length){
+    public static String getRandomSecretBase32(int length) {
         SecureRandom random = new SecureRandom();
         byte[] salt = new byte[length / 2];
         random.nextBytes(salt);

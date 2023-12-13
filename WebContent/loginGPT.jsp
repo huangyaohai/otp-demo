@@ -1,21 +1,14 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-         pageEncoding="UTF-8" %>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
     <title>Login</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         function changeCaptcha() {
-            // 当用户点击验证码图片时，changeCaptcha()函数被调用。该函数使用Math.random()方法生成一个介于0和1之间的随机数，并将其存储在randomNumber变量中。然后，该随机数被附加为查询参数rand的值到CaptchaServlet的URL中。通过这样做，强制浏览器从服务器获取一个新的验证码图片，从而实现了验证码的更换。每次点击图片时，生成的随机数都不同，因此浏览器会获取一个不同的验证码图片。
-            // Generate a random number to add to the CaptchaServlet URL to force a new captcha image
             var randomNumber = Math.random();
-
-            // Get the captcha image element
             var captchaImage = document.getElementById('captchaImage');
-
-            // Update the 'src' attribute of the captcha image with the new URL
             captchaImage.src = "CaptchaServlet?rand=" + randomNumber;
         }
 
@@ -24,7 +17,6 @@
             var captchaValidation = document.getElementById('captchaValidation');
 
             if (captchaInput.value.length === 6) {
-                // Perform the validation by calling the VerifyServlet
                 console.log("Captcha: " + captchaInput.value);
                 $.ajax({
                     url: "CaptchaVerifyServlet",
@@ -51,6 +43,29 @@
     </script>
 
     <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        div {
+            margin-bottom: 15px;
+        }
+
+        span {
+            display: block;
+            margin-bottom: 5px;
+        }
+
         .captcha-container {
             display: flex;
             align-items: center;
@@ -82,27 +97,36 @@
         .captcha-validation.valid {
             background-image: url('images/green_check.png'); /* Replace with your green check image */
         }
-    </style>
 
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
 </head>
 <body>
-<h1>登录界面</h1>
-<form action="LoginServlet">
+<h1>Business Login</h1>
+<form action="LoginServlet" method="post">
     <div>
-        <span>请输入用户名</span><input type='text' name='username'></input>
+        <span>Username:</span>
+        <input type="text" name="username" required>
     </div>
     <div>
-        <span>请输入校验码</span><input type='text' name='otp'></input>
+        <span>One-Time Password:</span>
+        <input type="text" name="otp" required>
     </div>
     <div class="captcha-container">
-        <span>请输入图片验证码</span>
-        <input type="text" name="captcha" id="captchaInput" class="captcha-input" maxlength="6"
-               placeholder="Please Enter Captcha" onkeyup="checkCaptcha()">
+        <span>Image Verification Code:</span>
+        <input type="text" name="captcha" id="captchaInput" class="captcha-input" maxlength="6" placeholder="Enter Captcha" onkeyup="checkCaptcha()" required>
         <img src="CaptchaServlet" alt="Captcha Image" id="captchaImage" class="captcha-image" onclick="changeCaptcha()">
         <span id="captchaValidation" class="captcha-validation"></span>
     </div>
-    <input type="submit" content="提交">
+    <input type="submit" value="Submit">
 </form>
-
 </body>
 </html>

@@ -1,7 +1,9 @@
 package com.wjs.util;
 
 /**
+ *
  */
+
 import java.util.HashMap;
 import java.util.Locale;
 

@@ -7,7 +7,7 @@ CREATE TABLE `t_user` (
 
 
 创建用户：
-	运行RegistTest的main方法，注意修改f_temp[临时二维码图片存放目录]，email[接收二维码图片邮箱地址]
+	运行RegisterTest的main方法，注意修改f_temp[临时二维码图片存放目录]，email[接收二维码图片邮箱地址]
 	
 工程部署在tomcat下，登录地址：
 	http://127.0.0.1:8580/login.jsp

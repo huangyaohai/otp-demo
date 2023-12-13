@@ -1,62 +1,69 @@
 package com.wjs.otpdemo;
 
-import java.io.IOException;
+import com.wjs.dao.UserDao;
+import com.wjs.dao.UserVo;
+import com.wjs.util.TotpUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.lang3.StringUtils;
-
-import com.wjs.dao.UserDao;
-import com.wjs.dao.UserVo;
-import com.wjs.util.TotpUtil;
+import java.io.IOException;
 
 /**
  * Servlet implementation class LoginServlet
  */
 public class LoginServlet extends HttpServlet {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * @see HttpServlet#HttpServlet()
-	 */
-	public LoginServlet() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public LoginServlet() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
 
-	/**
-	 * @see HttpServlet#service(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
-	protected void service(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+    /**
+     * @see HttpServlet#service(HttpServletRequest request, HttpServletResponse
+     * response)
+     */
+    protected void service(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-		String userName = request.getParameter("username");
-		String otp = request.getParameter("otp");
+        String userName = request.getParameter("username");
+        String otp = request.getParameter("otp");
 
-		System.out.println("userName:" + userName + ",otp:" + otp);
-		response.setCharacterEncoding("UTF-8");   
-		response.setContentType("text/html;charset=UTF-8");
-		UserDao dao = new UserDao();
-		UserVo vo = dao.getUserByName(userName);
-		if (null == vo) {
-			response.getWriter().println("ÓÃ»§²»´æÔÚ£¬userName:" + userName);
-			return;
-		}
-		String secretBase32 = vo.getOtpSk();
+        // åˆ¤æ–­å›¾ç‰‡éªŒè¯ç æ˜¯å¦æ­£ç¡®ï¼ˆä¸åŒºåˆ†å¤§å°å†™ï¼‰
+        String captcha = (String) request.getSession().getAttribute("captcha");
+        String captcha2 = request.getParameter("captcha");
+        if (!captcha.equalsIgnoreCase(captcha2)) {
+            response.getWriter().println("Invalid captcha: å›¾ç‰‡éªŒè¯ç ä¸æ­£ç¡®");
+            return;
+        }
 
-		if (StringUtils.isNotBlank(secretBase32)) {
-			if (!TotpUtil.verify(secretBase32, otp)) {
-				response.getWriter().println("¿ÚÁî²»ÕıÈ·£¬otp_code:" + otp);
-				return;
-			} else {
-				response.getWriter().println("<H1>µÇÂ¼³É¹¦£¬¸øÄãµãÔŞ</H1><br/><span>Ğ¡Ğ¡¿ªÔ´£¬¾èÔùÒ»¸ö£¬²»¸ºÄê»ª²»¸ºÇä</span><br/><image src='https://oss.aliyuncs.com/aliyun_id_photo_bucket/account-console-aliyun-com/suyin58_gmail_com149720850051248671.jpeg'></image>");
-				return;
-			}
-		}
-	}
+        System.out.println("userName:" + userName + ",otp:" + otp);
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("text/html;charset=UTF-8");
+        UserDao dao = new UserDao();
+        UserVo vo = dao.getUserByName(userName);
+        if (null == vo) {
+            response.getWriter().println("ç”¨æˆ·ä¸å­˜åœ¨ï¼ŒuserName:" + userName);
+            return;
+        }
+        String secretBase32 = vo.getOtpSk();
+
+        if (StringUtils.isNotBlank(secretBase32)) {
+            if (!TotpUtil.verify(secretBase32, otp)) {
+                response.getWriter().println("å£ä»¤ä¸æ­£ç¡®ï¼Œotp_code:" + otp);
+                return;
+            } else {
+                response.getWriter().println("<H1>ç™»å½•æˆåŠŸ</H1>");
+                //response.getWriter().println("<H1>ç™»å½•æˆåŠŸï¼Œç»™ä½ ç‚¹èµ</H1><br/><span>å°å°å¼€æºï¼Œæèµ ä¸€ä¸ªï¼Œä¸è´Ÿå¹´åä¸è´Ÿå¿</span><br/><image src='https://oss.aliyuncs.com/aliyun_id_photo_bucket/account-console-aliyun-com/suyin58_gmail_com149720850051248671.jpeg'></image>");
+                return;
+            }
+        }
+    }
 
 }
